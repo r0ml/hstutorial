@@ -1,14 +1,19 @@
-
 {-
 import Control.Monad (forM)
 import System.Directory (doesDirectoryExist, getDirectoryContents)
 import System.FilePath ((</>), takeExtension )
 import System.Environment (getArgs)
+import System.Posix (getFileStatus, getSymbolicLinkStatus, isSymbolicLink)
+
+import Control.Exception (bracket_)
+import Control.Concurrent.QSem
+import Data.Either
 
 import Debug.Trace
 -}
 
 import Preface.R0ml
+import Control.Concurrent.Async
 
 getRecursiveContents :: FilePath -> IO [FilePath]
 getRecursiveContents topdir = do
@@ -25,14 +30,24 @@ getRecursiveContents topdir = do
 simpleFind p path = do
   names <- getRecursiveContents path
   let z = filter p names
-  return (map (drop (1+length path)) z)
+  -- return (map (drop (1+length path)) z)
+  return z
 
-extension :: String -> String -> Bool
 extension c p = takeExtension p == '.':c 
 
-main :: IO ()
+isLink p = isSymbolicLink <$> getSymbolicLinkStatus p
+
+
 main = do
   (a:b:_) <- getArgs
 -- GOOD ONE!
-  mapM_ putStrLn =<< (simpleFind (extension a) b)
+  qs <- newQSem (read a :: Int) 
+  let throttled n = bracket_ (waitQSem qs) (signalQSem qs) (isLink n)
+  nms <- getRecursiveContents b
+  as <- mapM (async . throttled) nms
+  rs <- mapM wait as
+  mapM_ putStrLn ( map snd ( filter fst (zip rs nms)))
+
+  
+--   mapM_ putStrLn =<< (simpleFind (extension a) b)
 
