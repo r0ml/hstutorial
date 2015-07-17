@@ -29,8 +29,23 @@ library
 --   build-depends:      base, tutorial, QuickCheck, Cabal
 --   ghc-options: -Wall
 --   hs-source-dirs: test
-
 -- -----------------------------------------------
+
+Executable md5
+  Default-Language: Haskell2010
+  Build-Depends: base, bytestring
+  hs-source-dirs: .
+  ghc-options: -Wall
+  main-is: MD5.hs
+
+Executable md5c
+  Default-Language: Haskell2010
+  Build-Depends: base, bytestring
+  hs-source-dirs: .
+  ghc-options: -Wall
+  main-is: MD5c.hs
+  C-Sources: mx.c
+
 Executable Network
   Default-Language: Haskell2010
   Build-Depends: base, tutorial, preface-r0ml
