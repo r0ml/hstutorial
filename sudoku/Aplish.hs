@@ -13,6 +13,19 @@ rcb = { ( iota w ) , each box disclose w star divide 2 }
 svec = { disclose (cmap rcb rho w) pvex / (emt w), enclose enclose w} 
 -}
 
+
+{-
+at←{⍵+(⍴⍵)↑(-⍺⍺)↑⍺}
+avl←{(⍳⊃⍴⍵)~⍵×⊃⍺⌷⍺⍺}
+box←{⍵⌿⍵/⍵ ⍵⍴⍳⍵*2}
+cmap←{⊂[⍳⍴⍴⍵]1∊¨⍵∘.=⍵}
+emt←{(,⍵=0)/,⍳⍴⍵}
+pvec←{(⍺(⍺⍺ avl)⍵)(⍺ at)¨⊂⍵}
+pvex←{⊃,/⍺∘(⍺⍺ pvec)¨⍵}
+rcb←{(⍳⍵),¨box⊃⍵*÷2}
+svec←{⊃(cmap rcb⍴⍵)pvex/(emt ⍵),⊂⊂⍵}
+ -}
+
 chunk :: Int -> [e] -> [[e]]
 chunk i ls = map (take i) (chunker ls [])  where
         chunker [] n = n
