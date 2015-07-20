@@ -13,7 +13,7 @@ import Control.Exception (catch, SomeException)
 -}
 
 import Preface.R0ml
-import Control.Concurrent.Async
+-- import Control.Concurrent.Async
 
 getFileSize :: FilePath -> IO Integer
 -- getFileSize path = getFileStatus path >>= return . fromIntegral . fileSize
@@ -45,9 +45,10 @@ getRecursiveContents ochan topdir = do
                      let path = topdir </> name
                      -- putStrLn path
                      isDirectory <- doesDirectoryExist path
+                     isFile <- doesFileExist path
                      if isDirectory
                         then writeChan ochan (Left True) >> grc n path ochan
-                        else catch (getFileSize path >>= \x -> writeChan ochan (Right ((drop n path), x))) ((const (return ()))::SomeException -> IO ())
+                        else if isFile then catch (getFileSize path >>= \x -> writeChan ochan (Right ((drop n path), x))) ((const (return ()))::SomeException -> IO ()) else return ()
                in mapM_ unthrottled properNames
       writeChan ochan (Left False)
 
